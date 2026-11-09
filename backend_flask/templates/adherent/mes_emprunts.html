@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}Mon Espace Lecteur{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Profil et Carte QR virtuelle -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 rounded-3 mb-4 text-center p-4">
+            <div class="w-16 h-16 bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fs-2 fw-bold mx-auto mb-3">
+                {{ adherent.prenom[0] }}{{ adherent.nom[0] }}
+            </div>
+            <h4 class="fw-bold mb-1">{{ adherent.prenom }} {{ adherent.nom }}</h4>
+            <p class="text-muted font-monospace small mb-2">{{ adherent.numero_carte }}</p>
+
+            <span class="badge {% if adherent.a_abonnement_valide() %}bg-success{% else %}bg-danger{% endif %} py-2 mb-3">
+                {% if adherent.a_abonnement_valide() %}Abonnement Actif (jusqu'au {{ adherent.date_fin_abonnement }}){% else %}Abonnement Expiré{% endif %}
+            </span>
+
+            <!-- Image QR Code générée -->
+            <div class="p-2 border rounded-3 bg-white d-inline-block shadow-xs mb-3">
+                <img src="{{ qr_code_image }}" alt="QR Code Lecteur" class="img-fluid" style="width: 180px; height: 180px;">
+            </div>
+            <p class="text-muted small mb-0">Présentez ce QR Code au guichet du bibliothécaire pour emprunter ou retourner vos livres.</p>
+        </div>
+    </div>
+
+    <!-- Prêts, Réservations et Pénalités -->
+    <div class="col-lg-8">
+        <!-- Emprunts en cours -->
+        <div class="card shadow-sm border-0 rounded-3 mb-4">
+            <div class="card-header bg-white fw-bold py-3 d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-book"></i> Mes Emprunts en Cours ({{ prets_actifs|length }} / 3)</span>
+                <span class="badge bg-primary-subtle text-primary">Quota max : 3</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ouvrage</th>
+                                <th>Date Emprunt</th>
+                                <th>Retour Prévu</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in prets_actifs %}
+                            <tr>
+                                <td>
+                                    <strong>{{ p.exemplaire.ouvrage.titre }}</strong><br>
+                                    <small class="text-muted font-monospace">{{ p.exemplaire.code_barre }}</small>
+                                </td>
+                                <td>{{ p.date_pret }}</td>
+                                <td class="{% if p.statut == 'EN_RETARD' %}text-danger fw-bold{% endif %}">{{ p.date_retour_prevue }}</td>
+                                <td>
+                                    <span class="badge {% if p.statut == 'EN_RETARD' %}bg-danger animate-pulse{% else %}bg-primary{% endif %}">
+                                        {{ p.statut }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">Aucun livre emprunté actuellement.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Réservations actives -->
+        <div class="card shadow-sm border-0 rounded-3 mb-4">
+            <div class="card-header bg-white fw-bold py-3">
+                <i class="bi bi-clock-history"></i> Mes Réservations d'Ouvrages
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ouvrage visé</th>
+                                <th>Statut</th>
+                                <th>Délai retrait</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in reservations %}
+                            <tr>
+                                <td><strong>{{ r.ouvrage.titre }}</strong></td>
+                                <td>
+                                    <span class="badge {% if r.statut == 'DISPONIBLE' %}bg-success{% elif r.statut == 'EN_ATTENTE' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                        {{ r.statut }}
+                                    </span>
+                                </td>
+                                <td>{{ r.date_expiration_retrait or 'En attente de restitution' }}</td>
+                                <td class="text-end">
+                                    {% if r.statut in ['EN_ATTENTE', 'DISPONIBLE'] %}
+                                    <form method="POST" action="{{ url_for('adherent.annuler_ma_reservation', reservation_id=r.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Annuler</button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center py-3 text-muted">Aucune réservation enregistrée.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pénalités -->
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white fw-bold py-3">
+                <i class="bi bi-cash-coin"></i> Mes Pénalités
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Motif</th>
+                                <th>Montant</th>
+                                <th>État</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pen in penalites %}
+                            <tr>
+                                <td>{{ pen.motif }}</td>
+                                <td class="font-monospace fw-bold">{{ pen.montant|int }} DH</td>
+                                <td>
+                                    {% if pen.est_payee %}
+                                        <span class="badge bg-success">Réglée</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">À régler au comptoir</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3" class="text-center py-3 text-muted">Situation en règle (aucune pénalité).</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

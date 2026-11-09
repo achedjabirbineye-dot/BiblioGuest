@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Tableau de Bord{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+        <h2 class="fw-bold text-dark mb-1">Tableau de Bord Bibliothécaire</h2>
+        <p class="text-muted small mb-0">Gestion centralisée du catalogue, des exemplaires et des flux au comptoir.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('bibliothecaire.comptoir_pret') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-box-arrow-right"></i> Enregistrer un Prêt
+        </a>
+        <a href="{{ url_for('bibliothecaire.comptoir_retour') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-box-arrow-in-left"></i> Enregistrer un Retour
+        </a>
+    </div>
+</div>
+
+<!-- Cartes KPI -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 rounded-3 p-3">
+            <span class="text-muted small text-uppercase fw-bold">Ouvrages & Titres</span>
+            <h3 class="fw-bold text-primary mt-2 mb-0">{{ kpis.total_ouvrages }}</h3>
+            <span class="text-muted small">{{ kpis.total_exemplaires }} exemplaires physiques</span>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 rounded-3 p-3">
+            <span class="text-muted small text-uppercase fw-bold">Prêts en cours</span>
+            <h3 class="fw-bold text-success mt-2 mb-0">{{ kpis.prets_en_cours }}</h3>
+            <span class="text-muted small">Dans les délais</span>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4 rounded-3 p-3 bg-danger-subtle">
+            <span class="text-danger small text-uppercase fw-bold">Prêts en retard</span>
+            <h3 class="fw-bold text-danger mt-2 mb-0">{{ kpis.prets_en_retard }}</h3>
+            <span class="text-danger small">Pénalités applicables</span>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-4 rounded-3 p-3">
+            <span class="text-muted small text-uppercase fw-bold">Réservations actives</span>
+            <h3 class="fw-bold text-warning mt-2 mb-0">{{ kpis.reservations_en_attente }}</h3>
+            <span class="text-muted small">En file d'attente FIFO</span>
+        </div>
+    </div>
+</div>
+
+<!-- Raccourcis comptoir & actions rapides -->
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 rounded-3 h-100">
+            <div class="card-header bg-white fw-bold">
+                <i class="bi bi-diagram-3"></i> Diagramme d'Activités : Comptoir Physique
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Les prêts et retours physiques s'effectuent obligatoirement au guichet par le bibliothécaire
+                    conformément au diagramme d'activités validé.
+                </p>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('bibliothecaire.comptoir_pret') }}" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        <strong>Guichet Prêt :</strong> Saisie de la carte (QR) et du code-barre
+                    </a>
+                    <a href="{{ url_for('bibliothecaire.comptoir_retour') }}" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-box-arrow-in-left me-2"></i>
+                        <strong>Guichet Retour :</strong> Restitution, calcul pénalité (50 DH/j, max 100 DH)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 rounded-3 h-100">
+            <div class="card-header bg-white fw-bold">
+                <i class="bi bi-info-circle"></i> Paramètres de Gestion Actifs (Section 4)
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush small">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Durée nominale d'un prêt :</span>
+                        <strong class="text-primary">15 jours (renouvelable 1 fois)</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Quota d'emprunts simultanés max :</span>
+                        <strong>3 ouvrages</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Pénalité de retard par jour :</span>
+                        <strong class="text-danger">50 DH / jour</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Plafond maximal de la pénalité :</span>
+                        <strong class="text-danger">100 DH</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Validité de retrait d'une réservation :</span>
+                        <strong>7 jours</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

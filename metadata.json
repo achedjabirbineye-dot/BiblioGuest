@@ -1,0 +1,6 @@
+{
+  "name": "BiblioGest - Gestion de Bibliothèque UML",
+  "description": "Application web de gestion de bibliothèque conforme aux 4 diagrammes UML : ouvrages, exemplaires, prêts, retours, réservations, pénalités et QR codes.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

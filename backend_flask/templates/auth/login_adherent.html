@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Connexion Adhérent{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white border-0 text-center pt-4">
+                <div class="w-12 h-12 bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-2">
+                    <i class="bi bi-qr-code-scan fs-3"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Espace Adhérent</h4>
+                <p class="text-muted small">Présentez votre QR Code ou saisissez votre numéro de carte</p>
+            </div>
+
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('auth.login_adherent') }}" id="loginForm">
+                    <!-- Saisie du numéro de carte (solution de repli obligatoire - Section 2) -->
+                    <div class="mb-3">
+                        <label for="numero_carte" class="form-label fw-semibold text-secondary small">
+                            Numéro de carte adhérent (ou scanné) <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-credit-card"></i></span>
+                            <input type="text" class="form-control text-uppercase font-monospace" id="numero_carte" name="numero_carte" placeholder="ETU-2025-XXXX" required autofocus>
+                        </div>
+                        <div class="form-text small">Exemple démo : <code>ETU-2025-0001</code></div>
+                    </div>
+
+                    <!-- Mot de passe de secours (Section 3) -->
+                    <div class="mb-4">
+                        <label for="mot_de_passe" class="form-label fw-semibold text-secondary small">
+                            Mot de passe de secours (si perte de carte)
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                            <input type="password" class="form-control" id="mot_de_passe" name="mot_de_passe" placeholder="Optionnel si carte scannée">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                        <i class="bi bi-box-arrow-in-right"></i> Accéder à mon espace
+                    </button>
+                </form>
+
+                <!-- Zone de scan webcam simulé / interactif -->
+                <div class="mt-4 pt-3 border-top text-center">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="simulerScanWebcam()">
+                        <i class="bi bi-camera"></i> Déclencher lecture webcam (Simulation QR)
+                    </button>
+                    <p class="text-muted small mt-2 mb-0">En cas d'échec du capteur, la saisie manuelle ci-dessus est toujours active.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function simulerScanWebcam() {
+    // Remplissage automatique comme si la caméra avait lu le QR Code
+    document.getElementById('numero_carte').value = 'ETU-2025-0001';
+    alert("QR Code détecté avec succès : ETU-2025-0001");
+}
+</script>
+{% endblock %}

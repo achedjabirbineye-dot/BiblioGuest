@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Carte de Lecteur - {{ adherent.prenom }} {{ adherent.nom }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <!-- Badge officiel imprimable -->
+        <div class="card border border-2 border-primary rounded-4 shadow-lg overflow-hidden bg-white print-area">
+            <div class="bg-primary text-white p-3 text-center">
+                <span class="text-uppercase small fw-bold tracking-widest d-block">Bibliothèque Universitaire</span>
+                <h5 class="fw-bold mb-0">CARTE D'ADHÉRENT OFFICIELLE</h5>
+            </div>
+
+            <div class="card-body p-4 text-center">
+                <div class="p-2 border rounded-3 bg-white d-inline-block shadow-sm mb-3">
+                    <img src="{{ qr_code_image }}" alt="QR Code Carte" style="width: 200px; height: 200px;">
+                </div>
+
+                <h4 class="fw-bold text-dark mb-0">{{ adherent.prenom }} {{ adherent.nom }}</h4>
+                <p class="font-monospace text-primary fw-bold fs-5 mb-2">{{ adherent.numero_carte }}</p>
+
+                <div class="bg-light p-2 rounded-2 small text-muted mb-3">
+                    <div><strong>Email :</strong> {{ adherent.email }}</div>
+                    <div><strong>Validité abonnement :</strong> {{ adherent.date_fin_abonnement }}</div>
+                    <div><strong>Statut :</strong> <span class="badge bg-success">{{ adherent.statut|upper }}</span></div>
+                </div>
+
+                <button type="button" class="btn btn-outline-primary btn-sm d-print-none" onclick="window.print()">
+                    <i class="bi bi-printer"></i> Imprimer cette carte
+                </button>
+            </div>
+
+            <div class="card-footer bg-light text-center small text-muted border-top-0 py-2">
+                TP OMDL • Conforme Diagrammes UML
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
